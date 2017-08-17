@@ -1160,4 +1160,59 @@ class IndicesNamespace extends AbstractNamespace
 
         return $this->performRequest($endpoint);
     }
+
+    public function createAnalyzer($analyzer,$index,$filters,$tokenizer){
+
+        $this->close(['index'=>$index]);
+        $body = [
+            'settings' => [
+                "analysis"=> [
+                    "analyzer"=> [
+                        $analyzer=> [
+                            "filter"=> $filters,
+                            "tokenizer"=> $tokenizer
+                        ]
+                    ]
+                ],
+            ]
+        ];
+
+        /** @var callback $endpointBuilder */
+        $endpointBuilder = $this->endpoints;
+        $endpoint = $endpointBuilder('Indices\Settings\Put');
+        $endpoint->setIndex($index)
+            ->setBody($body);
+
+        $return = $this->performRequest($endpoint);
+        $this->open(['index'=>$index]);
+        return $return;
+    }
+
+    public function createSynonymFilter($filter,$index,$synonyms){
+        $this->close(['index'=>$index]);
+        $body = [
+            'settings' => [
+                "analysis"=> [
+                    "filter"=> [
+                        $filter=> [
+                            "type"=> 'synonym',
+                            "synonyms"=> $synonyms
+                        ]
+                    ]
+                ],
+            ]
+        ];
+
+        /** @var callback $endpointBuilder */
+        $endpointBuilder = $this->endpoints;
+        $endpoint = $endpointBuilder('Indices\Settings\Put');
+        $endpoint->setIndex($index)
+            ->setBody($body);
+
+        $return = $this->performRequest($endpoint);
+        $this->open(['index'=>$index]);
+        return $return;
+    }
+
+
 }

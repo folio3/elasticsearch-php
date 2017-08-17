@@ -749,6 +749,16 @@ class Client
         return $this->performRequest($endpoint);
     }
 
+    public function import($index,$type,$input_data){
+        $data =[];
+        foreach($input_data as $row) {
+            $data [] = ['index'=>['_index'=>$index,'_type'=>$type]];
+            $data []= $row;
+        }
+        $this->bulk(['body'=>$data]);
+
+    }
+
     /**
      * $params['index']        = (string) The name of the index (Required)
      *        ['type']         = (string) The type of the document (Required)
