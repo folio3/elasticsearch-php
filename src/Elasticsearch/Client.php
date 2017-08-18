@@ -20,6 +20,7 @@ use Elasticsearch\Namespaces\RemoteNamespace;
 use Elasticsearch\Namespaces\SnapshotNamespace;
 use Elasticsearch\Namespaces\BooleanRequestWrapper;
 use Elasticsearch\Namespaces\TasksNamespace;
+use PhpParser\Node\Expr\Cast\Object_;
 
 /**
  * Class Client
@@ -749,7 +750,16 @@ class Client
         return $this->performRequest($endpoint);
     }
 
-    public function import($index,$type,$input_data){
+    public function import($index,$type,$input_data,$mapping){
+        if($this->indices()->exists(['index'=>$index])){
+            $this->indices()->delete(['index' => $index]);
+        }
+        $this->indices()->create([
+            'index'=>$index,
+            'body'=>[
+                'mappings'=>$mapping
+            ]
+        ]);
         $data =[];
         foreach($input_data as $row) {
             $data [] = ['index'=>['_index'=>$index,'_type'=>$type]];
